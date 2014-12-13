@@ -60,7 +60,7 @@ class Map:
     set_bgcolor = simplet_class_method(status_output(lib.simplet_map_set_bgcolor, [c_void_p, c_char_p]))
     get_bgcolor = simplet_class_method(str_ptr_output(lib.simplet_map_get_bgcolor, None, [c_void_p]))
 
-    __add_layer = simplet_class_method(bind_function(lib.simplet_map_add_layer, c_void_p, [c_void_p, c_char_p]))
+    __add_layer = simplet_class_method(bind_function(lib.simplet_map_add_vector_layer, c_void_p, [c_void_p, c_char_p]))
     def add_layer(self, datastring):
         lyr_ptr = c_void_p(self.__add_layer(datastring))
         lyr = Layer(ptr=lyr_ptr)
@@ -104,21 +104,21 @@ class Bounds:
 
 class Layer:
     
-    __layer_new = bind_function(lib.simplet_layer_new, c_void_p, [c_char_p])
-    __layer_free = bind_function(lib.simplet_layer_free, None, [c_void_p])
+    __vector_layer_new = bind_function(lib.simplet_vector_layer_new, c_void_p, [c_char_p])
+    __vector_layer_free = bind_function(lib.simplet_vector_layer_free, None, [c_void_p])
 
     set_source = simplet_class_method(bind_function(lib.simplet_layer_set_source, None, [c_void_p,c_char_p]))
     get_source = simplet_class_method(str_ptr_output(lib.simplet_layer_get_source, None, [c_void_p]))
 
-    __add_query = simplet_class_method(bind_function(lib.simplet_layer_add_query, c_void_p, [c_void_p, c_char_p]))
-    def add_query(self, ogrsql):
-        query_ptr = c_void_p(self.__add_query(ogrsql))
+    __vector_add_query = simplet_class_method(bind_function(lib.simplet_vector_layer_add_query, c_void_p, [c_void_p, c_char_p]))
+    def vector_add_query(self, ogrsql):
+        query_ptr = c_void_p(self.__vector_add_query(ogrsql))
         query = Query(ptr=query_ptr)
         self.queries.append(query)
         return query
 
-    __add_query_directly = simplet_class_method(bind_function(lib.simplet_layer_add_query_directly, c_void_p, [c_void_p, c_void_p]))
-    def add_query_directly(self, query):
+    __vector_add_query_directly = simplet_class_method(bind_function(lib.simplet_vector_layer_add_query_directly, c_void_p, [c_void_p, c_void_p]))
+    def vector_add_query_directly(self, query):
         query_ptr = c_void_p(self.__add_query_directly(query._simplet_ptr))
         self.queries.append(query)
         return query
@@ -127,7 +127,7 @@ class Layer:
         if kwargs.has_key("ptr"):
             self._simplet_ptr = kwargs.get("ptr")
         elif kwargs.has_key("datastring"):
-            self._simplet_ptr = c_void_p(self.__layer_new(kwargs.get("datastring")))
+            self._simplet_ptr = c_void_p(self.__vector_layer_new(kwargs.get("datastring")))
 
         self.queries = []
 
